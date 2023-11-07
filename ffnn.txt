@@ -1,0 +1,85 @@
+ffnn 
+
+
+a. Import the necessary packages
+
+
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.datasets import mnist
+import matplotlib.pyplot as plt
+     
+b. Load the training and testing data (MNIST/CIFAR10)
+
+
+# Load the MNIST dataset
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+#normalize the input data to range [0, 1]
+x_train = x_train.astype('float32') / 255.0
+x_test = x_test.astype('float32') / 255.0
+
+#flatten the input data (28 X 28 images to 784 pixels)
+x_train = x_train.reshape(-1, 784)
+x_test = x_test.reshape(-1, 784)
+     
+c. Define the network architecture using Keras
+
+
+model = Sequential()
+model.add(Dense(128, activation='relu', input_shape=(784,)))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(10, activation='softmax'))
+
+     
+d. Train the model using SGD
+
+
+# from keras.src.engine.training import optimizer
+# compile the model
+model.compile(optimizer='sgd', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+# Train the model
+history = model.fit(x_train, y_train, epochs=10, batch_size=64, validation_split=0.2)
+
+
+
+e. Evaluate the network
+
+
+test_loss, test_accuracy = model.evaluate(x_test, y_test)
+print(f'Test Loss: {test_loss:.4f}')
+print(f'Test Accuracy: {test_accuracy:.4f}')
+     
+f. Plot the training loss and accuracy
+
+
+train_loss = history.history['loss']
+val_loss = history.history['val_loss']
+train_acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+epochs = range(1, len(train_loss) + 1)
+     
+
+plt.figure(figsize=(12, 5))
+plt.subplot(1, 2, 1)
+plt.plot(epochs, train_loss, 'b', label='Training Loss')
+plt.plot(epochs, val_loss, 'r', label='Validation Loss')
+plt.title('Training and validation Loss')
+plt.xlabel("Epochs")
+plt.ylabel("Loss")
+plt.legend()
+
+plt.subplot(1, 2, 2)
+plt.plot(epochs, train_acc, 'b', label='Training Accuracy')
+plt.plot(epochs, val_acc, 'b', label='Validation Accuracy')
+plt.title('Training and Validation Accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+
+plt.tight_layout()
+plt.show()
+     
